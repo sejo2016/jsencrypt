@@ -5260,6 +5260,57 @@ var JSEncrypt = /** @class */ (function () {
             return false;
         }
     };
+	/**
+   * 长文本加密
+   * @param {string} string 待加密长文本
+   * @returns {string} 加密后的base64编码
+   * */
+  JSEncrypt.prototype.encryptLong = function (string) {
+    var k = this.getKey();
+    var maxLength = (((k.n.bitLength()+7)>>3)-11);
+    try {
+      var lt = "";
+      var ct = "";
+      if (string.length > maxLength) {
+        lt = string.match(/.{1,245}/g);
+        lt.forEach(function(entry) {
+          var t1 = k.encrypt(entry);
+          ct += t1 ;
+        });
+        return hex2b64(ct);
+      }
+      var t = k.encrypt(string);
+      var y = hex2b64(t);
+      return y;
+    } catch (ex) {
+      return false;
+    }
+  };
+  /**
+   * 长文本解密
+   * @param {string} string 加密后的base64编码
+   * @returns {string} 解密后的原文
+   * */
+  JSEncrypt.prototype.decryptLong = function (string) {
+    var k = this.getKey();
+    var maxLength = ((k.n.bitLength()+7)>>3);
+    try {
+      var string = b64tohex(string);
+      var ct = "";
+      if (string.length > maxLength ) {
+        var lt = string.match(/.{1,512}/g);  //128位解密。取256位
+        lt.forEach(function(entry) {
+          var t1 = k.decrypt(entry);
+          ct += t1;
+        });
+        return ct;
+      }
+      var y = k.decrypt(b64tohex(string));
+      return y;
+    } catch (ex) {
+      return false;
+    }
+  };
     /**
      * Proxy method for RSAKey object's sign.
      * @param {string} str the string to sign
