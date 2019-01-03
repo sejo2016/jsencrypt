@@ -5260,6 +5260,15 @@ var JSEncrypt = /** @class */ (function () {
             return false;
         }
     };
+	 JSEncrypt.prototype.encryptHex = function (str) {
+        // Return the encrypted string.
+        try {
+            return this.getKey().encrypt(str);
+        }
+        catch (ex) {
+            return false;
+        }
+    };
 	/**
    * 长文本加密
    * @param {string} string 待加密长文本
